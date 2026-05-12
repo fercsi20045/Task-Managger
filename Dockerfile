@@ -5,7 +5,7 @@ COPY pom.xml .
 # Függőségek előre letöltése (cache optimalizálás)
 RUN mvn dependency:go-offline -q
 COPY src ./src
-RUN mvn package -DskipTests -q
+RUN mvn package -DskipTests
 
 # --- Runtime stage ---
 FROM eclipse-temurin:17-jre-alpine
