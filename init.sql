@@ -1,14 +1,11 @@
--- Task Manager adatbázis inicializáló script
--- Futtatás: psql -U postgres -f init.sql
+-- Felhasználó létrehozása ha még nem létezik
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'taskuser') THEN
+    CREATE USER taskuser WITH PASSWORD 'taskpassword';
+  END IF;
+END $$;
 
--- Adatbázis és felhasználó létrehozása
-CREATE DATABASE taskmanager;
-CREATE USER taskuser WITH PASSWORD 'taskpassword';
 GRANT ALL PRIVILEGES ON DATABASE taskmanager TO taskuser;
-
-\connect taskmanager
-
--- Séma jogosultság
 GRANT ALL ON SCHEMA public TO taskuser;
 
 -- Felhasználók táblája
@@ -31,10 +28,5 @@ CREATE TABLE IF NOT EXISTS tasks (
     user_id     BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Index a felhasználó feladatainak gyors lekérdezéséhez
 CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_status  ON tasks(status);
-
--- Teszt adatok (opcionális)
--- INSERT INTO users (username, email, password, role)
--- VALUES ('admin', 'admin@example.com', '$2a$10$...bcrypt_hash...', 'ADMIN');
